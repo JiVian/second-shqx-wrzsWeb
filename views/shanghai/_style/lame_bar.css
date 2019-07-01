@@ -1,0 +1,27 @@
+.chart_item {
+  margin-bottom: 30px;
+  display: inline-block;
+  font-size: 14px;
+}
+.chart_item > div {
+  vertical-align: middle;
+  display: inline-block;
+  margin: 0 5px;
+}
+.chart_item .bar{
+  height: 20px;
+  width: 310px;
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+}
+.chart_item .bar div {
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 10px;
+}
+.chart_item .value {
+  width: 30px;
+}

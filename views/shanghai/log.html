@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>实时故障日志查询</title>
+    <style>
+        body {
+            /* width: 1880px; */
+            height: 988px;
+            margin: 0;
+            padding: 0;
+            scroll-snap-type-y:auto;
+            background: #0A1433;
+        }
+        .background {
+            width:100%;
+            height:100%;
+            padding-top: 60px;
+            overflow: hidden;
+        }
+        .title {
+            width: 100%;
+            height: 66px;
+            margin-bottom:20px;
+            text-align: center;
+        }
+        .content {
+            width: 65%;
+            margin: 0 auto;
+            position:relative;
+        }
+        .smsLink{
+            position:absolute;
+            top: 6px;
+            right:95px;
+            width:100px;
+            height:40px;
+            font-size:18px;
+            color:#fff;
+        }
+        .alarmLink{
+            position:absolute;
+            top: 6px;
+            right:-14px;
+            width:100px;
+            height:40px;
+            font-size:18px;
+            color:#fff;
+        }
+        .search {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        select {
+            width:133px;
+            height: 30px;
+            background-color: #01071B;
+            border:1px solid #1B4379;
+            color: #fff;
+            padding-left: 10px;
+            margin-right: 10px;
+        }
+        button {
+            width: 80px;
+            height: 30px;
+            background-color: #3F9DFF;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        .tableBig{
+            height: 700px;
+            overflow-y: scroll;
+        }
+        .table {
+            width: 100%;
+            height: 700px;
+            text-align: center;
+            border-collapse:collapse;
+            color:#fff;
+            border:1px solid #1B4379;
+        }
+        .thead {
+            background: #1F4B85;
+        }
+        th,td {
+            padding: 10px 0;
+            font-weight: normal;
+        }
+        th {
+            font-size: 18px;
+        }
+        td {
+            font-size: 16px;
+        }
+        tbody tr:nth-child(even) {
+            background-color: #0A1433;
+        }
+        tbody tr:nth-child(odd) {
+            background-color: #0E1F43;
+        }
+        .demo-input{
+            padding-left: 10px;
+            height: 30px;
+            width: 130px; 
+            line-height: 30px; 
+            background-color: #01071B;
+            border: 1px solid #1B4379;
+            border-radius: 2px;
+            color: #fff;
+        }
+        ::-webkit-input-placeholder{
+          color: #fff;
+        }
+        .layui-laydate-footer{
+          padding:10px 5px;
+        }
+        .log_wrapper{
+            width: 100%;
+            height: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 10;
+            font-size: 14px;
+            color: rgba(0, 0, 0, 0.8);
+        }
+        .pop_log{
+			margin:12% auto;
+    		width: 400px;
+    		padding: 30px 30px 0 30px;
+			border-radius: 5px;
+    		color: white;
+            background: #111831;
+		}
+		.old_log{
+			margin-bottom:20px;
+		}
+		.passput{
+			display: inline-block;
+			width:50%;
+			background: #fff;
+        }
+        .define{
+            width:100%;
+            text-align: center;
+        }
+		.definebut{
+			background: #032549;
+    		color: white;
+			border: 1px solid #3f9dff;
+            margin:20px 30px 20px 30px;
+            cursor: pointer;
+        }
+        .alarm_log{
+            margin:12% auto;
+    		width: 270px;
+            text-align: center;
+            padding:15px;
+			border-radius: 5px;
+    		color: white;
+            background: #111831;
+        }
+        .areaSel{
+            width:170px;
+            height:25px;
+            background: #fff;
+            color:black;
+            margin-right:0;
+        }
+        .areaPsd{
+            width: 153px;
+            height: 20px;
+            margin: 20px 0 0 0;
+            padding-left: 13px;
+        }
+        .alarm_but{
+            background: #032549;
+            color: white;
+            border: 1px solid #3f9dff;
+            margin: 0 1px 0 6px;
+            cursor: pointer;
+        }
+        .cancel{
+            border: 1px solid grey;
+        }
+        [v-cloak]{
+            display: none;
+        }
+        .areaPsd::-webkit-input-placeholder{
+            color:grey;
+        }
+        .areaPsd::-moz-placeholder{   /* Mozilla Firefox 19+ */
+            color:grey;
+        }
+        .areaPsd::-moz-placeholder{    /* Mozilla Firefox 4 to 18 */
+            color:grey;
+        }
+        .areaPsd::-ms-input-placeholder{  /* Internet Explorer 10-11 */ 
+            color:grey;
+        }
+        p{
+            margin-top:0;
+        }
+    </style>
+</head>
+<body>
+    <div class="background" id="app" >
+        <div class="title">
+            <img src="../shanghai/img/实时故障日志查询.png" alt="">
+        </div>
+        <div class="content">
+            <div class="search">
+                <select name="" id="" @change="stationSelect($event)">
+                    <option value="">选择区县</option>
+                    <option v-for="(item,index) in stationName" ::key="index" :value="item">{{item}}</option>
+                </select>
+                <select name="" id="" @change="typeSelect($event)">
+                    <option value="">选择设备类型</option>
+                    <option v-for="(item,index) in type" ::key="index" :value="item">{{item}}</option>
+                </select>
+                <select name="" id=""  @change="faultSelect($event)" v-cloak>
+                  <option>实时异常设备记录</option>
+                  <option>历史异常设备记录</option>
+                </select>
+                <div style="display:inline-block" v-show="timeBox"> 
+                    <input @click="getStart()" type="text"  class="demo-input" placeholder="选择开始时间查询" id="test5" v-cloak>
+                    <input @click="getEnd()" type="text"  class="demo-input" placeholder="选择结束时间查询" id="test6" v-cloak>
+                </div>
+                <button @click="getMessage()">查询</button>
+                <button @click="download()">下载</button>
+            </div>
+            <div style="display: none;">
+                <form action="" method="post" id="exportForm">
+                    <input type="hidden" name="barcodes" />
+                </form>
+            </div>
+            <div class="tableBig" v-if="detailMessage.length>0">
+               <table class="table">
+                    <thead class="thead">
+                        <tr>
+                            <th>区名</th>
+                            <th>设备类型</th>
+                            <th>设备名称</th>
+                            <th>故障发生时间</th>
+                            <th v-if= "faultParam == 'fault_history'">故障恢复时间</th>
+                            <th>文件内容</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="(item, index) in detailMessage" :key="index">
+                            <td>{{ item.stationName }}</td>
+                            <td>{{ item.type }}</td>
+                            <td>{{ item.device_remark }}</td>
+                            <td>{{ item.fault_time }}</td>
+                            <td v-if= "faultParam == 'fault_history'">{{ item.recover_time }}</td>
+                            <td>{{ item.device_status }}</td>
+                        </tr>
+                    </tbody>
+               </table>
+            </div>
+            <a href="javascript:;" class="smsLink" @click="loginSms()">管理员功能</a>
+            <a href="javascript:;" class="alarmLink" @click="loginAlarm()">报警设置</a>
+        </div>
+        <!-- 管理员短信设置登录弹框 -->
+        <div class="log_wrapper" v-if="isLogin" v-cloak>
+            <div class="pop_log" >
+                <div class="old_log">
+                    <span>请输入管理员登录密码:</span>
+                    <input type="password" class="passput" v-model="userpsd">
+                </div>
+                <div class="define">
+                    <button class="definebut" @click="formSms()">登录</button>
+                    <button class="definebut cancel" @click="hideSms()">取消</button>
+                </div>
+            </div>
+        </div>
+        <!-- 报警设置登录弹框 -->
+        <div class="log_wrapper" v-if="isAlarm" v-cloak>
+            <div class="alarm_log" >
+                <div class="old_log">
+                    <p>请输入管理员密码:</p>
+                    <select class="areaSel" name="" id="" @change="alarmSelect($event)">
+                        <option value="">选择区县</option>
+                        <option v-for="(item,index) in stationName" ::key="index" :value="item">{{item}}</option>
+                    </select>
+                    <input type="password" class="areaPsd" v-model="alarmpsd" placeholder="请输入密码"/>
+                </div>
+                <div class="define">
+                    <button class="alarm_but" @click="formAlarm()">登录</button>
+                    <button class="alarm_but cancel" @click="hideAlarm()">取消</button>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</body>
+<script src="../../js/lib/require.js"></script> 
+<script>
+    requirejs(['../../js/common'], function (common) {
+        requirejs(['views/shanghai/control/log']);
+    });
+</script>
+
+
+</html>

@@ -1,0 +1,126 @@
+.state_wrapper {
+  position: absolute;
+}
+.state {
+  display: inline-block;
+  height: 8px;
+  width: 8px;
+  background: #84a486;
+  margin-bottom: 1px;
+}
+.state_wrapper.active {
+  z-index: 2
+}
+.state_wrapper .state {
+  background: #39e600;
+}
+.state_wrapper .state.error {
+  background: #ff321c;
+}
+.upload_state, .communication_state {
+  margin-right: 1px;
+}
+.measurement_time {
+  width: 26px;
+  height: 10px;
+  border: 1px solid #84a486;
+  padding: 1px;
+  box-sizing: border-box;
+}
+.measurement_time div {
+  height: 100%;
+  background:#84a486;
+}
+.state_wrapper .measurement_time div {
+  background:#39e600;
+}
+.status_detail {
+  padding: 5px 10px;
+  font-size: 12px;
+  background: #04113c;
+  border: 1px solid #2870c5;
+  position: relative;
+  opacity: 0;
+  z-index: 2;
+  width: 112px;
+}
+
+.status_detail h5 {
+  font-size: 14px;
+  font-weight: normal;
+  margin: 0 0 5px 0;
+}
+.state_wrapper.active .status_detail {
+  opacity: 1;
+}
+.status_detail::before {
+  z-index: 2;
+}
+.status_detail::before, .status_detail::after {
+  content: '';
+  display: block;
+  border-width: 6px;
+  border-style: solid;
+  border-color: transparent;
+  position: absolute;
+  top: 20px;
+}
+.left .status_detail, .right .status_detail {
+  top: -33px;
+}
+.left .status_detail {
+  left: -144px;
+}
+.left .status_detail::before {
+  border-left-color: #04113c;
+  right: -11px;
+}
+.left .status_detail::after {
+  border-left-color: #2870c5;
+  right: -12px;
+}
+.right .status_detail {
+  left: 40px;
+}
+.right .status_detail::before {
+  border-right-color: #04113c;
+  left: -11px;
+}
+.right .status_detail::after {
+  border-right-color: #2870c5;
+  left: -12px;
+}
+.top .status_detail {
+  top: -95px;
+  left: -90px;
+}
+.top .status_detail::before, .top .status_detail::after {
+  left: 96px;
+}
+.top .status_detail::before {
+  border-top-color: #04113c;
+  top: 57px;
+}
+.top .status_detail::after {
+  border-top-color: #2870c5;
+  top: 59px;
+}
+/* 
+.left .status_detail::before {
+  border-color: transparent;
+  border-left-color: #04113c;
+  right: -11px;
+}
+.left .status_detail::after {
+  border-color: transparent;
+  border-left-color: #04113c;
+  right: -11px;
+}  */
+.status_detail h5 {
+  font-size: 14px;
+  font-weight: normal;
+  margin: 0;
+}
+.status_detail p {
+  margin: 2px 0;
+}

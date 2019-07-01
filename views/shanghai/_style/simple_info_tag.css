@@ -1,0 +1,87 @@
+.simple_info_tag_wrapper {
+  position: absolute;
+  background: #023b1a;
+  border: 1px solid #249366;
+  border-image: -webkit-linear-gradient(to right, #249366,#fff) 1 1 stretch;
+  border-image: -moz-linear-gradient(to right, #249366,#fff) 1 1 stretch;
+  border-image: linear-gradient(to right, #249366,#fff) 1 1 stretch;
+  padding: 0 10px 0 5px;
+  cursor: default;
+}
+.simple_info_tag_wrapper.error {
+  background: #810505;
+  border: 1px solid #e3200c;
+  border-image: -webkit-linear-gradient(to right, #e3200c,#fff) 1 1 stretch;
+  border-image: -moz-linear-gradient(to right, #e3200c,#fff) 1 1 stretch;
+  border-image: linear-gradient(to right, #e3200c,#fff) 1 1 stretch;
+}
+.simple_info_tag_wrapper::before, .simple_info_tag_wrapper::after {
+  content: '';
+  display: block;
+  position: absolute;
+  border-width: 6px;
+  border-color: transparent;
+  border-style: solid;
+}
+.simple_info_tag_wrapper.top::before, .simple_info_tag_wrapper.top::after {
+  left: 50%;
+  margin-left: -5px;
+}
+.simple_info_tag_wrapper.top::before {
+  bottom: -12px;
+  border-top-color: #249366
+}
+.simple_info_tag_wrapper.top.error::before {
+  border-top-color: #e3200c
+}
+.simple_info_tag_wrapper.top::after {
+  bottom: -11px;
+  border-top-color: #023b1a;
+}
+.simple_info_tag_wrapper.error.top::after {
+  border-top-color: #810505;
+}
+.simple_info_tag_wrapper.right::before, .simple_info_tag_wrapper.right::after, .simple_info_tag_wrapper.left::before, .simple_info_tag_wrapper.left::after {
+  top: 24%
+}
+.simple_info_tag_wrapper.right::before {
+  left: -12px;
+  border-right-color: #249366
+}
+.simple_info_tag_wrapper.error.right::before {
+  border-right-color: #e3200c
+}
+.simple_info_tag_wrapper.right::after {
+  left: -11px;
+  border-right-color: #023b1a;
+}
+.simple_info_tag_wrapper.error.right::after {
+  border-right-color: #810505;
+}
+.simple_info_tag_wrapper.left::before {
+  right: -12px;
+  border-left-color: #249366
+}
+.simple_info_tag_wrapper.left::after {
+  right: -11px;
+  border-left-color: #023b1a;
+}
+.simple_info_tag_wrapper.error.left::before {
+  border-left-color: #e3200c
+}
+.simple_info_tag_wrapper.error.left::after {
+  border-left-color: #810505;
+}
+.simple_info_tag_item {
+  font-size: 12px;
+  text-align: left;
+  margin: 2px 0;
+}
+.simple_info_tag_item div {
+  width: 20px;
+  text-align: center;
+  display: inline-block;
+}
+.simple_info_tag_item div img {
+  vertical-align: middle;
+}

@@ -1,0 +1,45 @@
+*{
+  font-family: Helvetica, Tahoma, Arial, STXihei, "华文细黑", Heiti, "黑体", "Microsoft YaHei", "微软雅黑", SimSun, "宋体", sans-serif;
+}
+body{
+  background: #011230;
+  overflow: hidden;
+}
+iframe{
+  height: 100%;
+  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+}
+[v-cloak] {
+  display: none;
+}
+main{
+  /* overflow: hidden; */
+  position: relative;
+  color: #fefefe;
+  transform-origin: left top;
+  overflow: hidden;
+
+}
+
+main.screenSize-2-2{
+  height: 1080px;
+  width: 1920px;
+}
+
+main.screenSize-2-3{
+  height: 1080px;
+  width: 2880px;
+}
+
+.scale-x067{
+  transform: scaleX(0.66667);
+}
+[v-cloak]{
+    display:none
+}

@@ -1,0 +1,3 @@
+git remote add origin https://git.coding.net/aprilfall/ynqx.git
+git push -u origin master
+git clone https://git.coding.net/aprilfall/ynqx.git

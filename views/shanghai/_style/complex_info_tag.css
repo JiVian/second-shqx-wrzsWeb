@@ -1,0 +1,104 @@
+.complex_info_tag_wrapper {
+  position: absolute;
+  text-align: left
+}
+.complex_info_tag_max {
+  width: auto;
+  padding: 5px 10px 5px 5px;
+
+}
+.complex_info_tag_min {
+  padding: 0 10px 0 5px;
+}
+
+.complex_info_tag {
+  background: #023b1a;
+  border: 1px solid #249366;
+  border-image: -webkit-linear-gradient(to right, #249366,#fff) 1 1 stretch;
+  border-image: -moz-linear-gradient(to right, #249366,#fff) 1 1 stretch;
+  border-image: linear-gradient(to right, #249366,#fff) 1 1 stretch;
+  cursor: pointer;
+  position: relative;
+  margin: 5px 0;
+  display: inline-block;
+}
+.error .complex_info_tag {
+  background: #810505;
+  border: 1px solid #e3200c;
+  border-image: -webkit-linear-gradient(to right, #e3200c,#fff) 1 1 stretch;
+  border-image: -moz-linear-gradient(to right, #e3200c,#fff) 1 1 stretch;
+  border-image: linear-gradient(to right, #e3200c,#fff) 1 1 stretch;
+}
+.complex_info_tag::before, .complex_info_tag::after {
+  content: '';
+  display: block;
+  position: absolute;
+  border-width: 6px;
+  border-color: transparent;
+  border-style: solid;
+}
+.top .complex_info_tag::before, .top .complex_info_tag::after {
+  left: 50%;
+  margin-left: -5px;
+}
+.top .complex_info_tag::before {
+  bottom: -13px;
+  border-top-color: #249366
+}
+.error.top .complex_info_tag::before {
+  border-top-color: #e3200c;
+}
+.top .complex_info_tag::after {
+  bottom: -12px;
+  border-top-color: #023b1a;
+}
+.error.top .complex_info_tag::after {
+  border-top-color: #810505;
+}
+.right .complex_info_tag::before, .right .complex_info_tag::after, .left .complex_info_tag::before, .left .complex_info_tag::after {
+  top: 20%
+}
+.right .complex_info_tag::before {
+  left: -12px;
+  border-right-color: #249366
+}
+.right.error .complex_info_tag::before {
+  border-right-color: #e3200c;
+}
+.right .complex_info_tag::after {
+  left: -11px;
+  border-right-color: #023b1a;
+}
+.error.right .complex_info_tag::after {
+  border-right-color: #810505;
+}
+.left .complex_info_tag::before {
+  right: -12px;
+  border-left-color: #249366
+}
+.left.error .complex_info_tag::before {
+  border-left-color: #e3200c;
+}
+.left .complex_info_tag::after {
+  right: -11px;
+  border-left-color: #023b1a;
+}
+.left.error .complex_info_tag::after {
+  border-left-color: #810505;
+}
+
+.complex_info_tag_item {
+  font-size: 12px;
+  text-align: left;
+  margin: 2px 0;
+  display: inline-block;
+}
+.complex_info_tag_min img {
+  vertical-align: -8px;
+}
+.complex_info_tag_min {
+  width: auto;
+}
+/* .complex_info_tag_max {
+  display: none;
+} */

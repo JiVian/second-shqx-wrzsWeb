@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta http-equiv="refresh" content="10800">
+  <title>Document</title>
+  <link rel="stylesheet" href="../css/common.css">
+  <link rel="stylesheet" href="../css/normalize.css">
+</head>
+
+<body>
+  <iframe id="content" src="./../views/infoFlow/page.html" frameborder="0"></iframe>
+  <script src="../js/utils/WS.js"></script>
+  <script src="../js/utils/serverPath.js"></script>
+  <script>
+    
+    let wb = new WSFactory(serverPath.pageChanging + '');
+    con();
+    
+    //断开自动重连
+     setInterval(function(){
+    		var status = wb.connect.readyState; //连接状态（1：连接已建立；3：连接已关闭）
+    		console.log("ws:" + status);
+    		if(status == 3) {
+    			wb = new WSFactory(serverPath.pageChanging + '');
+    	        con();
+    		}
+    		
+    },5000);
+    
+    function con() {
+	    	wb.connect.addEventListener('message', function (e) {
+	    		document.querySelector('#content').src = JSON.parse(e.data).urlThree;
+	    })
+    }
+    
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>上海市气象观测业务监控平台</title>
+    <link rel="stylesheet" href="../../css/normalize.css">
+    <!-- <link rel="stylesheet" href="../../css/common.css"> -->
+    <link rel="stylesheet" href="./_style/lame_bar.css">
+    <link rel="stylesheet" href="./_style/status_tag.css">
+    <link rel="stylesheet" href="./_style/simple_info_tag.css">
+    <link rel="stylesheet" href="./_style/complex_info_tag.css">
+    <link rel="stylesheet" href="./page.css">
+</head>
+
+<body>
+    <main class="screenSize-2-2" id="app" v-cloak>
+        <div class="wrapper">
+            <h1 class="title">上海地面观测业务状态监控</h1>
+            <div class="left_part">
+                <h4 class="sub_title">国家气象站</h4>
+                <div class="map_wrapper" @dblclick="mapDialogVisible = true">
+                    <img class="legend" src="./img/legend.png" alt="">
+                    <div ref="map" style="height: 100%; width: 100%"></div>
+                    <status-tag v-for="(item, index) in mapData" :key="index" :position="[2, 3, 8, 9].indexOf(index) > -1 ? 'right' : 'left'" :class="'status_tag_' + index" :active="mapActiveIndex === index" :status="item"></status-tag>
+                </div>
+            </div>
+            <!-- 徐汇区观测场 -->
+            <div class="middle_part" v-if="currentInfo['station_name']!='宝山'">
+                <img src="./img/base.png" alt="">
+                <h4>{{currentInfo['station_name'] }}国家气象站</h4>
+                <!-- <img class="device device_0" v-if="deviceData['temp']" src="./img/device_0.png" alt=""> -->
+                <img class="device device_1" v-if="deviceData.radiation" src="./img/device_1.png" alt="">
+                <img class="device device_2" v-if="deviceData['newstation']['rain_wei']" src="./img/device_2.png" alt="">
+                <img class="device device_3" v-if="deviceData['newstation']['rain_fan']" src="./img/device_3.png" alt="">
+                <img class="device device_4" v-if="deviceData['newstation']['rain_chen']" src="./img/device_4.png" alt="">
+                <img class="device device_5" v-if="deviceData['newstation']['temperature'] || deviceData['newstation']['humidity']" src="./img/device_5.png" alt="">
+                <img class="device device_6" v-if="deviceData['newstation']['evaporation']" src="./img/device_6.png" alt="">
+                <img class="device device_7" v-if="deviceData['newstation']['collector'] || deviceData['newstation']['air_pressure']" src="./img/device_7.png" alt="">
+                <img class="device device_8" src="./img/device_8.png" alt="">
+                <img class="device device_9" v-if="deviceData['pc']" src="./img/device_9.png" alt="">
+                <img class="device device_10" v-if="deviceData['newstation']['wind_speed'] || deviceData['newstation']['wind_direction']" src="./img/device_10.png" alt="">
+                <img class="device device_11" v-if="deviceData['visibility']" src="./img/device_11.png" alt="">
+                <img class="device device_12" v-if="deviceData['weather']" src="./img/device_12.png" alt="">
+                <simple-info-tag v-for="(item, key, index) in deviceData.newstation" :position="['rain_wei','rain_fan','air_pressure'].indexOf(key) > -1 ? 'top' : 'right'" :key="index" :is-normal="item === 'normal'" :text="deviceDict[key].text" :class="['simple_info_tag_' + key, 'simple_info_tag_' + index]" :icon="deviceDict[key].icon"></simple-info-tag>
+                <simple-info-tag position="right" :is-normal="true" :text="deviceDict['serial_server'].text" class="simple_info_tag_serial_server" :icon="deviceDict['serial_server'].icon"></simple-info-tag>
+                    
+                <complex-info-tag v-if="deviceData['pc']" @click.native="getDetail('pc', deviceData['pc']['status'])" class="complex_info_tag_pc" :text="deviceDict['pc'].text" :data="deviceData['pc']" :icon="deviceDict['pc'].icon"></complex-info-tag>
+                <complex-info-tag v-if="deviceData['radiation']" position="top" @click.native="getDetail('radiation', deviceData['radiation']['status'])" class="complex_info_tag_radiation" :text="deviceDict['radiation'].text" :icon="deviceDict['radiation'].icon" :data="deviceData['radiation']"></complex-info-tag>
+                <complex-info-tag v-if="deviceData['visibility']" @click.native="getDetail('visibility', deviceData['visibility']['status'])" class="complex_info_tag_visibility" :text="deviceDict['visibility'].text" :icon="deviceDict['visibility'].icon" :data="deviceData['visibility']"></complex-info-tag>
+                <complex-info-tag v-if="deviceData['weather']" @click.native="getDetail('weather', deviceData['weather']['status'])" class="complex_info_tag_weather" :text="deviceDict['weather'].text" :icon="deviceDict['weather'].icon" :data="deviceData['weather']"></complex-info-tag>
+                <!-- <complex-info-tag v-if="deviceData['temp']" @click.native="getDetail('temp', deviceData['temp']['status'])" class="complex_info_tag_temp" :text="deviceDict['temp'].text" :icon="deviceDict['temp'].icon" :data="deviceData['temp']"></complex-info-tag> -->
+            
+                <div class="legend_wrapper middle_legend_wrapper">
+                    <div class="normal_legend legend_item">正常</div>
+                    <div class="abnormal_legend legend_item">异常</div>
+                </div>
+            </div> 
+            <!-- 宝山观测场 -->
+            <div class="middle_part" v-if="currentInfo['station_name']=='宝山'">
+                <img src="./img/base.png" alt="">
+                <h4>{{currentInfo['station_name'] }}国家气象站</h4>
+                <img class="device device_0" v-if="deviceData['temp']" src="./img/device_0.png" alt="">
+                <img class="device device_1" v-if="deviceData.radiation" src="./img/device_1.png" alt="">
+                <img class="device device_2 bs" v-if="deviceData['newstation']['rain_wei']" src="./img/device_2.png" alt="">
+                <img class="device device_3 bs" v-if="deviceData['newstation']['rain_fan']" src="./img/device_3.png" alt="">
+                <img class="device device_4 bs" v-if="deviceData['newstation']['rain_chen']" src="./img/device_4.png" alt="">
+                <img class="device device_5 bs" v-if="deviceData['newstation']['temperature'] || deviceData['newstation']['humidity']" src="./img/device_5.png" alt="">
+                <img class="device device_6 bs" v-if="deviceData['newstation']['evaporation']" src="./img/device_6.png" alt="">
+                <img class="device device_7" v-if="deviceData['newstation']['collector'] || deviceData['newstation']['air_pressure']" src="./img/device_7.png" alt="">
+                <img class="device device_8 bs" src="./img/device_8.png" alt="">
+                <img class="device device_9" v-if="deviceData['pc']" src="./img/device_9.png" alt="">
+                <img class="device device_10" v-if="deviceData['newstation']['wind_speed'] || deviceData['newstation']['wind_direction']" src="./img/device_10.png" alt="">
+                <img class="device device_11" v-if="deviceData['visibility']" src="./img/device_11.png" alt="">
+                <img class="device device_12" v-if="deviceData['weather']" src="./img/device_12.png" alt="">
+                <simple-info-tag v-for="(item, key, index) in deviceData.newstation" :position="['rain_wei','rain_fan','air_pressure'].indexOf(key) > -1 ? 'top' : 'right'" :key="index" :is-normal="item === 'normal'" :text="deviceDict[key].text" :class="['simple_info_tag_' + key + '_bs', 'simple_info_tag_' + index]" :icon="deviceDict[key].icon"></simple-info-tag>
+                <simple-info-tag position="right" :is-normal="true" :text="deviceDict['serial_server'].text" class="simple_info_tag_serial_server bs" :icon="deviceDict['serial_server'].icon"></simple-info-tag>
+                    
+                <complex-info-tag v-if="deviceData['pc']" @click.native="getDetail('pc', deviceData['pc']['status'])" class="complex_info_tag_pc" :text="deviceDict['pc'].text" :data="deviceData['pc']" :icon="deviceDict['pc'].icon"></complex-info-tag>
+                <complex-info-tag v-if="deviceData['radiation']" position="top" @click.native="getDetail('radiation', deviceData['radiation']['status'])" class="complex_info_tag_radiation" :text="deviceDict['radiation'].text" :icon="deviceDict['radiation'].icon" :data="deviceData['radiation']"></complex-info-tag>
+                <complex-info-tag v-if="deviceData['visibility']" @click.native="getDetail('visibility', deviceData['visibility']['status'])" class="complex_info_tag_visibility" :text="deviceDict['visibility'].text" :icon="deviceDict['visibility'].icon" :data="deviceData['visibility']"></complex-info-tag>
+                <complex-info-tag v-if="deviceData['weather']" @click.native="getDetail('weather', deviceData['weather']['status'])" class="complex_info_tag_weather" :text="deviceDict['weather'].text" :icon="deviceDict['weather'].icon" :data="deviceData['weather']"></complex-info-tag>
+                <complex-info-tag v-if="deviceData['temp']" position="top" @click.native="getDetail('temp', deviceData['temp']['status'])" class="complex_info_tag_temp" :text="deviceDict['temp'].text" :icon="deviceDict['temp'].icon" :data="deviceData['temp']"></complex-info-tag>
+                
+                <div class="legend_wrapper middle_legend_wrapper">
+                    <div class="normal_legend legend_item">正常</div>
+                    <div class="abnormal_legend legend_item">异常</div>
+                </div>
+            </div>
+
+
+            <div class="right_part">
+                <div class="right_part_top">
+                    <h4 class="sub_title">数据到报描述</h4>
+                    <div class="cts_wrapper">
+                        <div class="node node_0">
+                            <img src="./img/zhuji-2.png" alt="">
+                        </div>
+                        <!-- <div class="station_info_wrapper">
+                            <div class="station_info station_info_0"><img src="./img/zhuji1.png" alt=""> 主机</div>
+                            <div class="station_info station_info_1"><img src="./img/luyouqi.png" alt=""> 路由器</div>
+                        </div> -->
+                        <div class="node node_3" :class="{error: currentInfo['router_conty'] == 'unnormal'}">
+                            <img src="./img/luyouqi-2.png" alt="">
+                        </div>
+                        <div class="node node_4" :class="{error: currentInfo['router_city'] == 'unnormal'}">
+                            <img src="./img/luyouqi-2.png" alt="">
+                        </div>
+                        <div class="node node_1" :class="{error: currentInfo['line_one_status'] == 'unnormal', cts_error: currentInfo['transfer_status'] == 'unnormal',cts_notreceive:currentInfo['transfer_status']=='not_received'}">CTS</div>
+                        <div class="node node_2" :class="{error: currentInfo['line_two_status'] !== 'normal'}">国家局</div>
+                        <div class="info">
+                            <dl>
+                                <dd>{{ currentInfo['station_name'] }}站</dd>
+                                <dd>本站IP：{{ currentInfo['station_ip'] }}</dd>
+                                <dd>产品时间：{{ currentInfo['product_time'] }}</dd>
+                            </dl>
+                        </div>
+                        <div class="sectionArea">
+                            <p>区局路由器</p>
+                            <p>通信{{currentInfo['router_conty']==="normal"?"正常":"异常"}}</p>
+                        </div>
+                        <div class="sectionCity">
+                            <p>市局路由器</p>
+                            <p>通信{{currentInfo['router_city']==="normal"?"正常":"异常"}}</p>
+                        </div>
+                        <div class="info_bubble info_bubble_0 left">
+                            <dl>
+                                <!-- <dt>{{ currentInfo['line_one_status'] === 'normal' ? '及时' : '逾限' }}</dt> -->
+                                <dd v-if="currentInfo['transfer_status'] === 'normal'">到达时间：{{ currentInfo['cts_arrive_time'] }}</dd>
+                                <dd v-if="currentInfo['transfer_status'] === 'not_received'">未收到</dd>
+                                <dd v-if="currentInfo['transfer_status'] === 'unnormal'">逾限</dd>
+                            </dl>
+                        </div>
+                        <div class="cts-desc" :class="{error: currentInfo['transfer_status'] == 'unnormal',not_receive:currentInfo['transfer_status']=='not_received'}">
+                            {{ currentInfo['cts_des'] }}
+                        </div>
+                        <div class="country-desc">
+                            {{ currentInfo['nation_des'] }}
+                        </div>
+                        <div class="info_bubble info_bubble_1 left">
+                            <dl>
+                                <!-- <dt>{{ currentInfo['line_two_status'] === 'normal' ? '及时' : '逾限' }}</dt> -->
+                                <dd v-if="currentInfo['transfer_status'] === 'normal'">发送时间：{{ currentInfo['cts_send_time'] }}</dd>
+                                <dd v-if="currentInfo['transfer_status'] === 'not_received'">未收到</dd>
+                                <dd v-if="currentInfo['transfer_status'] === 'unnormal'">逾限</dd>
+                            </dl>
+                        </div>
+                        <div class="legend_wrapper right_legend_wrapper">
+                            <div class="normal_legend legend_item">正常</div>
+                            <div class="abnormal_legend legend_item">异常</div>
+                            <div class="receive_legend legend_item">未收到</div>
+                        </div>
+                    </div>
+                    
+                </div>
+                <div class="right_part_bottom">
+                    <div class="left_bottom">
+                        <h4 class="sub_title">数据到报统计</h4>
+                        <div class="chart">
+                            <lame-bar v-for="(item, key, index) in barChartData" :key="index" :value="`${item}%`" :bar-color="barColor[index]" :base-color="baseColor[index]" :label="barLabel[key]" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="map_dialog_wrapper dialog_wrapper" v-if="mapDialogVisible">
+            <div class="map_dialog dialog">
+                <div class="map_dialog_body dialog_body">
+                    <p v-if="mapChangeStopped" class="dialog_text">
+                        您确定继续轮播？
+                    </p>
+                    <div v-else>
+                        <p class="dialog_text">
+                            您确定停止轮播？请选择固定显示的信息
+                        </p>
+                        <select v-model="mapActiveIndex">
+                            <option v-for="(item, index) in mapData" :key="index" :value="index">{{ item.station_name }}</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="map_dialog_footer dialog_footer">
+                    <div class="map_button primary_button" @click="handleAction">确定</div>
+                    <div class="map_button" @click="mapDialogVisible = false">取消</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="detail_dialog_wrapper dialog_wrapper" v-if="detailDialogVisible">
+            <div class="detail_dialog dialog">
+                <div class="detail_dialog_header dialog_header">
+                    {{ detailData['deviceName'] }}
+                    <div @click="detailDialogVisible = false" class="close_dialog_button"><img src="./img/close.png" alt=""></div>
+                </div>
+                <div class="detail_dialog_body dialog_body">
+                    <p>
+                        <span> {{ detailData['station'] }}</span>
+                        <span> 检测时间: {{ detailData['time'] }}</span>
+                    </p>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>序号</th>
+                                <th>名称</th>
+                                <th>状态</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(item, index) in detailData.detail" :key="index" :class="{error: item['state'] !== '正常'&&item['name'].indexOf('值')==-1}">
+                                <td>{{ index + 1 }}</td>
+                                <td>{{ item['name'] }}</td>
+                                <td>{{ item["state"] }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+      
+    </main>
+
+    <script src="../../js/lib/require.js"></script>
+    <script>
+        requirejs(['../../js/common'], function (common) {
+            requirejs(['views/shanghai/control/page']);
+        });
+    </script>
+</body>
+
+</html>

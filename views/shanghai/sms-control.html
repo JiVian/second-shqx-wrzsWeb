@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>短信控制台</title>
+    <link rel="stylesheet" href="./smsControl.css">
+</head>
+<body>
+  <div id="app" v-if="isShow" v-cloak>
+    <h1>{{listName}}控制台</h1>
+    <div class="listPart">
+        <div class="control">
+            <select name="" id="" @change="typeSelect($event)">
+                <option value="" disabled="disabled" style="color:#fff">选择设备类型</option>
+                <option>地温</option>
+                <option>天气现象</option>
+                <option>能见度</option>
+                <option selected>自动站</option>
+                <option>辐射</option>
+            </select>
+            <a href="javascript:;" class="modifyk" @click="changePsd()">修改密码</a>
+            <button  @click="buttonClose()">批量操作关</button>
+            <button  @click="buttonOpen()">批量操作开</button>
+        </div>
+        <div class="table">
+            <table>
+                <thead class="thead">
+                    <tr>
+                        <th>
+                            <input type="checkbox" v-model='isAllChecked' @click='checkAll()'>
+                        </th>
+                        <th>序号</th>
+                        <th>设备名称</th>
+                        <th>设备类型</th>
+                        <th>状态</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="(item,index) in listData" :key="index" :value="item.id">
+                        <td><input type="checkbox" :value="item.id" v-model="checkedCode" @change="singleChecked" ></td>
+                        <td>{{index+1}}</td>
+                        <td>{{item.deviceName}}</td>
+                        <td>{{item.deviceTypeRemark}}</td>
+                        <td>
+                            <input :class="item.isSend ==='0' ? 'switch_on':'switch'" type="checkbox" 
+                            :value="item.isSend" @change="getStatus(item,index)"/>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <!-- 修改密码弹框 -->
+	<div class="log_wrapper" v-if="ischange" v-cloak>
+        <div class="pop_log">
+            <div class="old_log">
+                <span>请输入原密码:</span>
+                <input type="text" class="passput" v-model="oldPsd">
+            </div>
+            <div class="new_log">
+                <span>请输入新密码:</span>
+                <input type="password" class="passput" v-model="newPsd">
+            </div>
+            <div class="define">
+                <button class="definebut cancel" @click="hideBox()">取消</button>
+                <button class="definebut" @click="confirmPsd()">确认</button>
+            </div>
+        </div>
+    </div>
+  </div>
+  <script src="../../js/lib/require.js"></script> 
+  <script>
+      requirejs(['../../js/common.js'], function (common) {
+          requirejs(['views/shanghai/control/smsCon']);
+      }); 
+  </script> 
+</body>
+</html>

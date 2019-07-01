@@ -1,0 +1,1287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>统计与分析报表</title>
+    <style>
+        body {
+            width: 100%;
+            height: 950px;
+            margin: 0;
+            padding: 0;
+            background:#0A1433;
+        }
+        .background {
+            width:100%;
+            height:100%;
+            background-color: #0A1433;
+            padding-top: 30px;
+        }
+        .title {
+            width: 100%;
+            height: 66px;
+            margin-bottom:20px;
+            text-align: center;
+        }
+        .content {
+            width:100%;
+            height:100%;
+            background-color: #01071B;
+            padding-top: 10px;
+        }
+        .one {
+            width: 49%;
+            height: 460px;
+            background-color: #0A1433;
+            display: inline-block;
+            margin-right: .5%;
+        }
+        .two {
+            width: 49%;
+            height: 460px;
+            background-color: #0A1433;
+            display: inline-block;
+            /* margin-left: 30px; */
+        }
+        .three {
+            width: 49%;
+            height:460px;
+            background-color: #0A1433;
+            display: inline-block;
+        }
+        .fourPart{
+            width:49%;
+            height:auto;
+            padding-top:.5%;
+            margin:.5% .5% 0 0;
+            background:#0A1433;
+            display:inline-block;
+            text-align: center;
+            position:relative;
+        }
+        .four {
+            width: 95%;
+            /* height: 510px; */
+            display: inline-block;
+            margin-right: .5%;
+            margin-top: 10px;
+        }
+        .fourPart .chart{
+            height:412px;
+        }
+        select{
+            width:16%;
+            height:30px;
+            background-color: #01071B;
+            border: 1px solid #1B4379;
+            color: #fff;
+            padding-left: 10px;
+            margin-right:1.2%;
+        }
+        button{
+            width:13%;
+            height:30px;
+            background:#3F9DFF;
+            color:#fff;
+            border:none;
+        }
+        p {
+            font-size: 16px;
+            color: #fff;
+            text-align: center;
+        }
+        .timeSelect{
+            position: absolute;
+            right: 250px;
+            top: 60px;
+        }
+        .timeSelect input{
+            width:168px;
+            height:30px;
+            margin-right: 10px;
+            padding-left:10px;
+            background-color: #01071B;
+            border: 1px solid #1B4379;
+            color: #fff;
+        }
+        .timeSelect input::placeholder{
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="background" id="app">
+        <div class="title">
+            <img src="../shanghai/img/统计与分析报表.png" alt="">
+            <div class="timeSelect"> 
+                <input type="text"  class="demo-input" placeholder="选择开始时间查询" id="test1">
+                <input type="text"  class="demo-input" placeholder="选择结束时间查询" id="test2">
+            </div>
+        </div>
+        <div class="content">
+            <div class="one chart" id="chart1">
+            </div>
+            <div class="two chart" id="chart2">
+                <!-- <p>设备故障次数TOP5</p> -->
+            </div>
+            <div class="fourPart">
+                <select id="select1">
+                    <option value="">选择站名</option>
+                </select>
+                <select id="select2"><option value="">选择设备类型</option></select>
+                <select id="select3"><option value="">选择设备名称</option></select>
+                <button id="lineBut">查询折线图</button>
+                <div class="four chart" id="chart4">
+                    <!-- 设备修复时间折线图 -->
+                </div>    
+            </div>
+
+            <div class="three chart" id="chart3">
+                <!-- <p>区域故障次数TOP5</p> -->
+            </div>
+            
+            <!-- <div class="five"></div> -->
+        </div>
+    </div>
+</body>
+<!-- <script src="../../js/lib/require.js"></script> -->
+<script src="../../js/lib/echarts.min.js"></script>
+<script src="../../js/lib/jquery.js"></script>
+<script src="../../js/lib/layDate/laydate/laydate.js"></script>
+<script src="../../js/utils/serverPath.js"></script>
+
+<script>
+    var myChart1 = echarts.init(document.getElementById('chart1'));
+    var myChart2 = echarts.init(document.getElementById('chart2'));
+    var myChart3 = echarts.init(document.getElementById('chart3'));
+    var myChart4 = echarts.init(document.getElementById('chart4'));
+    var stationVal;
+    var typeVal;
+    var deviceVal;
+    var startTime;
+    var endTime;
+    
+    // 默认显示的图表数据
+    // myChart.setOption(option);
+    $.ajax({
+        type:'get',
+        url:serverPath.page1+'/faultStatistics?'+'startTime='+'&'+'endTime=',
+        async : true,
+        success:function(info) {
+            let data = JSON.parse(info)
+            let district_fault_num = data.district_fault_num;
+            let deviceTOP5 = data.deviceTOP5;
+            let districtTOP5 = data.districtTOP5;
+            let arrNum =[];
+            let arrName=[];
+            district_fault_num.forEach(element => {
+                arrNum.push(element.num)
+                arrName.push(element.stationName)
+            });
+            let arrDeviceNum = [];
+            let arrDeviceType = [];
+            deviceTOP5.forEach(element => {
+                arrDeviceNum.push(element.num)
+                arrDeviceType.push(element.type)
+            });
+            let arrAreaNum = [];
+            let arrAreaName = [];
+            districtTOP5.forEach(element => {
+                arrAreaNum.push(element.num)
+                arrAreaName.push(element.stationName)
+            });
+            console.log(90090);
+            // console.log(arr)
+            myChart1.setOption({
+                backgroundColor: '#0A1433',
+                title: {
+                text: '区域故障次数统计',
+                textStyle: {
+                    color:'#fff',
+                    fontStyle:'normal',
+                    fontWeight:'normal',
+                },
+                textAlign:'auto',
+                left:'42%',
+                top:20
+                },
+                color: ['#3F9DFF','#3F9DFF','#3F9DFF','#3F9DFF','#3F9DFF','#3F9DFF','#3F9DFF','#3F9DFF','#3F9DFF','#3F9DFF','#3F9DFF','#3F9DFF',],
+                tooltip: {},
+                legend: {
+                    show:false
+                },
+                xAxis: {
+                    data:arrName,
+                    axisLabel: {
+                        textStyle: {
+                            color: '#fff',  //更改坐标轴文字颜色
+                            fontSize : 12      //更改坐标轴文字大小
+                        }
+                    },
+                    splitLine:{
+                        show:false,
+                        axisLine: {
+                            lineStyle: {
+                                color:'#fff'
+                            },
+                            color: '#fff'
+                        }
+                    }
+                },
+                yAxis: {
+                    axisLabel: {
+                        textStyle: {
+                            color: '#fff',  //更改坐标轴文字颜色
+                            fontSize : 12      //更改坐标轴文字大小
+                        }
+                    },
+                    splitLine:{
+                        show:false
+                    }
+                },
+                series: [{
+                    name: '次数',
+                    type: 'bar',
+                    itemStyle: {
+                        color: "#2E6BE6",
+                    // barBorderRadius: [15,15, 15, 15],
+                    label: {
+                        textColor: '#fff'
+                    },
+                    },
+                    barWidth : 20,
+                    data:arrNum
+                }]
+            })
+            myChart2.setOption({
+                backgroundColor: '#0A1433',
+                title: {
+                    text: '设备故障次数TOP5',
+                    textStyle: {
+                        color:'#fff',
+                        fontStyle:'normal',
+                        fontWeight:'normal',
+                        align:'right',
+                    },
+
+                    textAlign:'center',
+                    left:'50%',
+                    top:20
+                },
+                tooltip: {},
+                legend: {
+                    show:false
+                },
+                xAxis: [{
+                    type: 'value',
+                    axisLine: {
+                        show: true
+                    },
+                    axisLabel: {
+                        textStyle: {
+                            color: '#fff',  //更改坐标轴文字颜色
+                            fontSize : 12,      //更改坐标轴文字大小
+                        }
+                    },
+                    splitLine:{
+                        show:false,
+                        axisLine: {
+                            lineStyle: {
+                                color:'#fff'
+                            },
+                            color: '#fff'
+                        }
+                    },
+                    // max:250,
+                }],
+                    grid: {
+                        x: '15%',
+                        y: '26%',
+                        height: '60%',
+                    },
+                yAxis: [{
+                    type: 'category',
+                    data: arrDeviceType,
+                    // splitLine: {show: false},
+                    axisLine: {
+                        show: true
+                    },
+                    axisLabel: {
+                        textStyle: {
+                            color: '#fff',  //更改坐标轴文字颜色
+                            fontSize : 12,      //更改坐标轴文字大小
+                        },
+                        // rotate:60,
+                    },
+                    splitLine:{
+                        show:false,
+                        axisLine: {
+                            lineStyle: {
+                                color:'#fff'
+                            },
+                            color: '#fff'
+                        }
+                    },
+                    axisTick: {
+                        show: true
+                    },
+                }],
+                series: [{
+                    name: '次数',
+                    type: 'bar',
+                    data: arrDeviceNum,
+                    itemStyle: {
+                        color: "#2E6BE6",
+                    // barBorderRadius: [15,15, 15, 15],
+                    // label: {
+                    //     textColor: 'red'
+                    // },
+                    },
+                    barWidth : 20,
+                    color: ['#DBA231','#DBA231','#DBA231','#DBA231'],
+                }]
+            })
+            myChart3.setOption({
+                backgroundColor: '#0A1433',
+                title: {
+                    text: '区域故障次数TOP5',
+                    textStyle: {
+                        color:'#fff',
+                        fontStyle:'normal',
+                        fontWeight:'normal',
+                        align:'right',
+                        marginTop:20
+                    },
+                    textAlign:'center',
+                    left:'50%',
+                    top:20
+                },
+                tooltip: {},
+                legend: {
+                    show:false
+                },
+                xAxis: [{
+                    type: 'value',
+                    axisLine: {
+                        show: true
+                    },
+                    splitLine: {show: false},
+                    axisLabel: {
+                        textStyle: {
+                            color: '#fff',  //更改坐标轴文字颜色
+                            fontSize : 12      //更改坐标轴文字大小
+                        }
+                    },
+                }],
+                grid: {
+                  x: '16%',
+                  y: '26%',
+                  height: '60%',
+                },
+                yAxis: [{
+                    type: 'category',
+                    data: arrAreaName,
+                    splitLine: {show: false},
+                    axisLine: {
+                        show: true
+                    },
+                    axisLabel: {
+                        textStyle: {
+                            color: '#fff',  //更改坐标轴文字颜色
+                            fontSize : 12      //更改坐标轴文字大小
+                        }
+                    },
+                    // axisTick: {
+                    //     show: false
+                    // },
+                    // offset: 10,
+                    // nameTextStyle: {
+                    //     fontSize: 15
+                    // }
+                }],
+                series: [{
+                    name: '次数',
+                    type: 'bar',
+                    data: arrAreaNum,
+                    itemStyle: {
+                        color: "#2E6BE6",
+                    // barBorderRadius: [15,15, 15, 15],
+                    // label: {
+                    //     textColor: 'red'
+                    // },
+                    },
+                    barWidth : 20,
+                    color: ['#44C670','#44C670','#44C670','#44C670','#44C670'],
+                }]
+            })
+            
+        },
+        error:function(error) {
+            // alert(1);
+            console.log(error)
+        }
+    })
+    //6.选择开始、结束时间查询图表（后加的需求）
+    lay('#version').html('-v'+ laydate.v);
+    laydate.render({
+      elem: '#test1', //指定元素
+      done: function(value){
+        startTime = value
+        console.log('选择开始时间',startTime)
+        $.ajax({
+            type:'get',
+            url:serverPath.page1+'/faultStatistics?'+'startTime='+startTime+'&'+'endTime=',
+            async : true,
+            success:function(info) {
+                let data = JSON.parse(info)
+                let district_fault_num = data.district_fault_num;
+                let deviceTOP5 = data.deviceTOP5;
+                let districtTOP5 = data.districtTOP5;
+                let arrNum =[];
+                let arrName=[];
+                district_fault_num.forEach(element => {
+                    arrNum.push(element.num)
+                    arrName.push(element.stationName)
+                });
+                let arrDeviceNum = [];
+                let arrDeviceType = [];
+                deviceTOP5.forEach(element => {
+                    arrDeviceNum.push(element.num)
+                    arrDeviceType.push(element.type)
+                });
+                let arrAreaNum = [];
+                let arrAreaName = [];
+                districtTOP5.forEach(element => {
+                    arrAreaNum.push(element.num)
+                    arrAreaName.push(element.stationName)
+                });
+                console.log(90090);
+                myChart1.setOption({
+                backgroundColor: '#0A1433',
+                title: {
+                text: '区域故障次数统计',
+                textStyle: {
+                    color:'#fff',
+                    fontStyle:'normal',
+                    fontWeight:'normal',
+                },
+                textAlign:'auto',
+                left:'42%',
+                top:20
+                },
+                color: ['#3F9DFF','#3F9DFF','#3F9DFF','#3F9DFF','#3F9DFF','#3F9DFF','#3F9DFF','#3F9DFF','#3F9DFF','#3F9DFF','#3F9DFF','#3F9DFF',],
+                tooltip: {},
+                legend: {
+                    show:false
+                },
+                xAxis: {
+                    data:arrName,
+                    axisLabel: {
+                        textStyle: {
+                            color: '#fff',  //更改坐标轴文字颜色
+                            fontSize : 12      //更改坐标轴文字大小
+                        }
+                    },
+                    splitLine:{
+                        show:false,
+                        axisLine: {
+                            lineStyle: {
+                                color:'#fff'
+                            },
+                            color: '#fff'
+                        }
+                    }
+                },
+                yAxis: {
+                    axisLabel: {
+                        textStyle: {
+                            color: '#fff',  //更改坐标轴文字颜色
+                            fontSize : 12      //更改坐标轴文字大小
+                        }
+                    },
+                    splitLine:{
+                        show:false
+                    }
+                },
+                series: [{
+                    name: '次数',
+                    type: 'bar',
+                    itemStyle: {
+                        color: "#2E6BE6",
+                    // barBorderRadius: [15,15, 15, 15],
+                    label: {
+                        textColor: '#fff'
+                    },
+                    },
+                    barWidth : 20,
+                    data:arrNum
+                }]
+            })
+                myChart2.setOption({
+                backgroundColor: '#0A1433',
+                title: {
+                    text: '设备故障次数TOP5',
+                    textStyle: {
+                        color:'#fff',
+                        fontStyle:'normal',
+                        fontWeight:'normal',
+                        align:'right',
+                    },
+
+                    textAlign:'center',
+                    left:'50%',
+                    top:20
+                },
+                tooltip: {},
+                legend: {
+                    show:false
+                },
+                xAxis: [{
+                    type: 'value',
+                    axisLine: {
+                        show: true
+                    },
+                    axisLabel: {
+                        textStyle: {
+                            color: '#fff',  //更改坐标轴文字颜色
+                            fontSize : 12,      //更改坐标轴文字大小
+                        }
+                    },
+                    splitLine:{
+                        show:false,
+                        axisLine: {
+                            lineStyle: {
+                                color:'#fff'
+                            },
+                            color: '#fff'
+                        }
+                    },
+                    // max:250,
+                }],
+                    grid: {
+                        x: '15%',
+                        y: '26%',
+                        height: '60%',
+                    },
+                yAxis: [{
+                    type: 'category',
+                    data: arrDeviceType,
+                    // splitLine: {show: false},
+                    axisLine: {
+                        show: true
+                    },
+                    axisLabel: {
+                        textStyle: {
+                            color: '#fff',  //更改坐标轴文字颜色
+                            fontSize : 12,      //更改坐标轴文字大小
+                        },
+                        // rotate:60,
+                    },
+                    splitLine:{
+                        show:false,
+                        axisLine: {
+                            lineStyle: {
+                                color:'#fff'
+                            },
+                            color: '#fff'
+                        }
+                    },
+                    axisTick: {
+                        show: true
+                    },
+                }],
+                series: [{
+                    name: '次数',
+                    type: 'bar',
+                    data: arrDeviceNum,
+                    itemStyle: {
+                        color: "#2E6BE6",
+                    // barBorderRadius: [15,15, 15, 15],
+                    // label: {
+                    //     textColor: 'red'
+                    // },
+                    },
+                    barWidth : 20,
+                    color: ['#DBA231','#DBA231','#DBA231','#DBA231'],
+                }]
+            })
+                myChart3.setOption({
+                backgroundColor: '#0A1433',
+                title: {
+                    text: '区域故障次数TOP5',
+                    textStyle: {
+                        color:'#fff',
+                        fontStyle:'normal',
+                        fontWeight:'normal',
+                        align:'right',
+                        marginTop:20
+                    },
+                    textAlign:'center',
+                    left:'50%',
+                    top:20
+                },
+                tooltip: {},
+                legend: {
+                    show:false
+                },
+                xAxis: [{
+                    type: 'value',
+                    axisLine: {
+                        show: true
+                    },
+                    splitLine: {show: false},
+                    axisLabel: {
+                        textStyle: {
+                            color: '#fff',  //更改坐标轴文字颜色
+                            fontSize : 12      //更改坐标轴文字大小
+                        }
+                    },
+                }],
+                grid: {
+                  x: '16%',
+                  y: '26%',
+                  height: '60%',
+                },
+                yAxis: [{
+                    type: 'category',
+                    data: arrAreaName,
+                    splitLine: {show: false},
+                    axisLine: {
+                        show: true
+                    },
+                    axisLabel: {
+                        textStyle: {
+                            color: '#fff',  //更改坐标轴文字颜色
+                            fontSize : 12      //更改坐标轴文字大小
+                        }
+                    },
+                }],
+                series: [{
+                    name: '次数',
+                    type: 'bar',
+                    data: arrAreaNum,
+                    itemStyle: {
+                        color: "#2E6BE6",
+                    },
+                    barWidth : 20,
+                    color: ['#44C670','#44C670','#44C670','#44C670','#44C670'],
+                }]
+            })
+
+            },
+            error:function(error) {
+                // alert(1);
+                console.log(error)
+            }
+        }),
+        //跟着更改的折线图
+        $.ajax({
+            type:'get',
+            url:serverPath.page1+'/deviceinterval'+'?'+'stationName=闵行'+'&'+'type=自动站'+'&'+'deviceName=气压'+'&'+'startTime='+startTime+'&'+'endTime=',
+            success:function(info){
+            console.log("默认显示的数据",info)
+            let data = JSON.parse(info)
+            let dataTimeX =[];
+                let dataInterY=[];
+                data.forEach(element => {
+                    dataTimeX.push(element.fault_time)
+                    dataInterY.push(element.recover_interval)
+                });
+            myChart4.setOption({
+                    title:{
+                        text:"设备修复时间（默认显示：闵行-自动站-气压）",
+                        textStyle:{
+                            color:'#fff',
+                            fontStyle:'normal',
+                            fontWeight:'normal',
+                            align:'right',
+                            marginTop:20
+                        },
+                        textAlign:'center',
+                        left:'50%',
+                        top:20
+                    },
+                    tooltip:{},
+                    grid:{
+                        top:'20%',
+                    },
+                    xAxis: {
+                        name:'设备异常时间',
+                        type: 'category',
+                        data: dataTimeX,
+                        axisLabel: {
+                            textStyle:{
+                                color: '#fff',
+                            }
+                        },
+                        nameTextStyle:{
+                            color:'#fff',
+                        }
+                    },
+                    yAxis: {
+                        name:'修复时长  单位：min',
+                        type: 'value',
+                        axisLabel: {
+                            textStyle:{
+                                color: '#fff',
+                            }
+                        },
+                        nameTextStyle:{
+                            color:'#fff',
+                        }
+                    },
+                    series: [{
+                        data:dataInterY,
+                        type: 'line'
+                    }]
+                })
+        },
+            error:function(error){
+                alert('默认显示的错误信息',error);
+            }
+        })
+        }
+    });
+    laydate.render({
+      elem: '#test2', //指定元素
+      done: function(value){
+        endTime = value
+        console.log('选择结束时间',endTime)
+        $.ajax({
+            type:'get',
+            url:serverPath.page1+'/faultStatistics?'+'startTime='+'&'+'endTime='+endTime,
+            async : true,
+            success:function(info) {
+                let data = JSON.parse(info)
+                let district_fault_num = data.district_fault_num;
+                let deviceTOP5 = data.deviceTOP5;
+                let districtTOP5 = data.districtTOP5;
+                let arrNum =[];
+                let arrName=[];
+                district_fault_num.forEach(element => {
+                    arrNum.push(element.num)
+                    arrName.push(element.stationName)
+                });
+                let arrDeviceNum = [];
+                let arrDeviceType = [];
+                deviceTOP5.forEach(element => {
+                    arrDeviceNum.push(element.num)
+                    arrDeviceType.push(element.type)
+                });
+                let arrAreaNum = [];
+                let arrAreaName = [];
+                districtTOP5.forEach(element => {
+                    arrAreaNum.push(element.num)
+                    arrAreaName.push(element.stationName)
+                });
+                console.log(90090);
+                myChart1.setOption({
+                backgroundColor: '#0A1433',
+                title: {
+                text: '区域故障次数统计',
+                textStyle: {
+                    color:'#fff',
+                    fontStyle:'normal',
+                    fontWeight:'normal',
+                },
+                textAlign:'auto',
+                left:'42%',
+                top:20
+                },
+                color: ['#3F9DFF','#3F9DFF','#3F9DFF','#3F9DFF','#3F9DFF','#3F9DFF','#3F9DFF','#3F9DFF','#3F9DFF','#3F9DFF','#3F9DFF','#3F9DFF',],
+                tooltip: {},
+                legend: {
+                    show:false
+                },
+                xAxis: {
+                    data:arrName,
+                    axisLabel: {
+                        textStyle: {
+                            color: '#fff',  //更改坐标轴文字颜色
+                            fontSize : 12      //更改坐标轴文字大小
+                        }
+                    },
+                    splitLine:{
+                        show:false,
+                        axisLine: {
+                            lineStyle: {
+                                color:'#fff'
+                            },
+                            color: '#fff'
+                        }
+                    }
+                },
+                yAxis: {
+                    axisLabel: {
+                        textStyle: {
+                            color: '#fff',  //更改坐标轴文字颜色
+                            fontSize : 12      //更改坐标轴文字大小
+                        }
+                    },
+                    splitLine:{
+                        show:false
+                    }
+                },
+                series: [{
+                    name: '次数',
+                    type: 'bar',
+                    itemStyle: {
+                        color: "#2E6BE6",
+                    // barBorderRadius: [15,15, 15, 15],
+                    label: {
+                        textColor: '#fff'
+                    },
+                    },
+                    barWidth : 20,
+                    data:arrNum
+                }]
+            })
+                myChart2.setOption({
+                backgroundColor: '#0A1433',
+                title: {
+                    text: '设备故障次数TOP5',
+                    textStyle: {
+                        color:'#fff',
+                        fontStyle:'normal',
+                        fontWeight:'normal',
+                        align:'right',
+                    },
+
+                    textAlign:'center',
+                    left:'50%',
+                    top:20
+                },
+                tooltip: {},
+                legend: {
+                    show:false
+                },
+                xAxis: [{
+                    type: 'value',
+                    axisLine: {
+                        show: true
+                    },
+                    axisLabel: {
+                        textStyle: {
+                            color: '#fff',  //更改坐标轴文字颜色
+                            fontSize : 12,      //更改坐标轴文字大小
+                        }
+                    },
+                    splitLine:{
+                        show:false,
+                        axisLine: {
+                            lineStyle: {
+                                color:'#fff'
+                            },
+                            color: '#fff'
+                        }
+                    },
+                    // max:250,
+                }],
+                    grid: {
+                        x: '15%',
+                        y: '26%',
+                        height: '60%',
+                    },
+                yAxis: [{
+                    type: 'category',
+                    data: arrDeviceType,
+                    // splitLine: {show: false},
+                    axisLine: {
+                        show: true
+                    },
+                    axisLabel: {
+                        textStyle: {
+                            color: '#fff',  //更改坐标轴文字颜色
+                            fontSize : 12,      //更改坐标轴文字大小
+                        },
+                        // rotate:60,
+                    },
+                    splitLine:{
+                        show:false,
+                        axisLine: {
+                            lineStyle: {
+                                color:'#fff'
+                            },
+                            color: '#fff'
+                        }
+                    },
+                    axisTick: {
+                        show: true
+                    },
+                }],
+                series: [{
+                    name: '次数',
+                    type: 'bar',
+                    data: arrDeviceNum,
+                    itemStyle: {
+                        color: "#2E6BE6",
+                    // barBorderRadius: [15,15, 15, 15],
+                    // label: {
+                    //     textColor: 'red'
+                    // },
+                    },
+                    barWidth : 20,
+                    color: ['#DBA231','#DBA231','#DBA231','#DBA231'],
+                }]
+            })
+                myChart3.setOption({
+                backgroundColor: '#0A1433',
+                title: {
+                    text: '区域故障次数TOP5',
+                    textStyle: {
+                        color:'#fff',
+                        fontStyle:'normal',
+                        fontWeight:'normal',
+                        align:'right',
+                        marginTop:20
+                    },
+                    textAlign:'center',
+                    left:'50%',
+                    top:20
+                },
+                tooltip: {},
+                legend: {
+                    show:false
+                },
+                xAxis: [{
+                    type: 'value',
+                    axisLine: {
+                        show: true
+                    },
+                    splitLine: {show: false},
+                    axisLabel: {
+                        textStyle: {
+                            color: '#fff',  //更改坐标轴文字颜色
+                            fontSize : 12      //更改坐标轴文字大小
+                        }
+                    },
+                }],
+                grid: {
+                  x: '16%',
+                  y: '26%',
+                  height: '60%',
+                },
+                yAxis: [{
+                    type: 'category',
+                    data: arrAreaName,
+                    splitLine: {show: false},
+                    axisLine: {
+                        show: true
+                    },
+                    axisLabel: {
+                        textStyle: {
+                            color: '#fff',  //更改坐标轴文字颜色
+                            fontSize : 12      //更改坐标轴文字大小
+                        }
+                    },
+                }],
+                series: [{
+                    name: '次数',
+                    type: 'bar',
+                    data: arrAreaNum,
+                    itemStyle: {
+                        color: "#2E6BE6",
+                    },
+                    barWidth : 20,
+                    color: ['#44C670','#44C670','#44C670','#44C670','#44C670'],
+                }]
+            })
+
+            },
+            error:function(error) {
+                // alert(1);
+                console.log(error)
+            }
+        })
+        //跟着更改的折线图
+        $.ajax({
+            type:'get',
+            url:serverPath.page1+'/deviceinterval'+'?'+'stationName=闵行'+'&'+'type=自动站'+'&'+'deviceName=气压'+'&'+'startTime='+'&'+'endTime='+endTime,
+            success:function(info){
+            console.log("默认显示的数据",info)
+            let data = JSON.parse(info)
+            let dataTimeX =[];
+                let dataInterY=[];
+                data.forEach(element => {
+                    dataTimeX.push(element.fault_time)
+                    dataInterY.push(element.recover_interval)
+                });
+            myChart4.setOption({
+                    title:{
+                        text:"设备修复时间（默认显示：闵行-自动站-气压）",
+                        textStyle:{
+                            color:'#fff',
+                            fontStyle:'normal',
+                            fontWeight:'normal',
+                            align:'right',
+                            marginTop:20
+                        },
+                        textAlign:'center',
+                        left:'50%',
+                        top:20
+                    },
+                    tooltip:{},
+                    grid:{
+                        top:'20%',
+                    },
+                    xAxis: {
+                        name:'设备异常时间',
+                        type: 'category',
+                        data: dataTimeX,
+                        axisLabel: {
+                            textStyle:{
+                                color: '#fff',
+                            }
+                        },
+                        nameTextStyle:{
+                            color:'#fff',
+                        }
+                    },
+                    yAxis: {
+                        name:'修复时长  单位：min',
+                        type: 'value',
+                        axisLabel: {
+                            textStyle:{
+                                color: '#fff',
+                            }
+                        },
+                        nameTextStyle:{
+                            color:'#fff',
+                        }
+                    },
+                    series: [{
+                        data:dataInterY,
+                        type: 'line'
+                    }]
+                })
+            },
+            error:function(error){
+                alert('默认显示的错误信息',error);
+            }
+            })
+      }
+    });
+    //1.选择站名数据
+    $(function(){
+        $.ajax({
+        type:'get',
+        url:serverPath.page1+'/stationNameDetail',
+        async:false,
+        success:function(info){
+            let data = JSON.parse(info)
+            $.each(data,function(index,item){
+                $("#select1").append(
+                    "<option value="+item+">"+item+"</option>",
+                );
+                $('#select1').trigger('change');
+            })
+        },
+        error:function(error){
+            alert('错误信息：',error)
+        }
+      })
+    })
+    //2.选择设备类型数据
+    $.ajax({
+        type:'get',
+        url:serverPath.page1+'/typeDetail',
+        success:function(info){
+            let data = JSON.parse(info)
+            $.each(data,function(index,item){
+                $("#select2").append(
+                    "<option value="+item+">"+item+"</option>"
+                );
+            })
+            $('#select1').trigger('change');
+        },
+        error:function(error){
+            alert('错误信息：',error)
+        }
+    })
+    //根据设备类型查询设备名称，展示第三个下拉框
+    $('#select2').click(function(){
+        stationVal = $("#select1").children('option:selected').val();
+        typeVal = $('#select2').children('option:selected').val();
+        //3.选择设备名称数据
+        $.ajax({
+            type:'get',
+            url:serverPath.page1+'/devicenamedetail'+'?'+'type='+typeVal,
+            success:function(info){
+                let data = JSON.parse(info)
+                $('#select3').empty();
+                $.each(data,function(index,item){
+                    $("#select3").append(
+                        "<option value="+item+">"+item+"</option>"
+                    );
+                })
+                $('#select1').trigger('change');
+            },
+            
+            error:function(error){
+                alert('错误信息：',error)
+            }
+        })
+    })
+    //点击查询，折线图数据变化
+    $('#lineBut').click(function(){
+        deviceVal = $('#select3').children('option:selected').val();
+        console.log('333根据条件查询',stationVal,typeVal,deviceVal)
+        //4.按条件返回设备修复时间间隔，用折线图
+        $.ajax({
+            type:'get',
+            url:serverPath.page1+'/deviceinterval'+'?'+'stationName='+stationVal+'&'+'type='+typeVal+'&'+'deviceName='+deviceVal+'&'+'startTime='+startTime+'&'+'endTime='+endTime,
+            success:function(info){
+                let data = JSON.parse(info)
+                let dataTimeX =[];
+                let dataInterY=[];
+                data.forEach(element => {
+                    dataTimeX.push(element.fault_time)
+                    dataInterY.push(element.recover_interval)
+                });
+                console.log('异常数据的折线',dataTimeX,dataInterY)
+                myChart4.setOption({
+                    title:{
+                        text:"设备修复时间",
+                        textStyle:{
+                            color:'#fff',
+                            fontStyle:'normal',
+                            fontWeight:'normal',
+                            align:'right',
+                            marginTop:20
+                        },
+                        textAlign:'center',
+                        left:'50%',
+                        top:20
+                    },
+                    tooltip:{},
+                    legend:{
+                        show:false,
+                    },
+                    grid:{
+                        top:'20%',
+                    },
+                    xAxis: {
+                        name:'设备异常时间',
+                        type: 'category',
+                        data: dataTimeX,
+                        axisLabel: {
+                            textStyle:{
+                                color: '#fff',
+                            }
+                        },
+                        nameTextStyle:{
+                            color:'#fff',
+                        }
+                    },
+                    yAxis: {
+                        name:'修复时长  单位：min',
+                        type: 'value',
+                        axisLabel: {
+                            textStyle:{
+                                color: '#fff',
+                            }
+                        },
+                        nameTextStyle:{
+                            color:'#fff',
+                        }
+                    },
+                    series: [{
+                        // data: [820, 932, 901, 934, 1290, 1330, 1320],
+                        data:dataInterY,
+                        type: 'line'
+                    }]
+                })
+            },
+            error:function(error){
+                console.log('error数据接收失败',error)
+            }
+        })
+    })
+    //默认显示的折线图
+    $.ajax({
+        type:'get',
+        url:serverPath.page1+'/deviceinterval'+'?'+'stationName=闵行'+'&'+'type=自动站'+'&'+'deviceName=气压'+'&'+'startTime='+startTime+'&'+'endTime='+endTime,
+        success:function(info){
+            console.log("默认显示的数据",info)
+            let data = JSON.parse(info)
+            let dataTimeX =[];
+                let dataInterY=[];
+                data.forEach(element => {
+                    dataTimeX.push(element.fault_time)
+                    dataInterY.push(element.recover_interval)
+                });
+            myChart4.setOption({
+                    title:{
+                        text:"设备修复时间（默认显示：闵行-自动站-气压）",
+                        textStyle:{
+                            color:'#fff',
+                            fontStyle:'normal',
+                            fontWeight:'normal',
+                            align:'right',
+                            marginTop:20
+                        },
+                        textAlign:'center',
+                        left:'50%',
+                        top:20
+                    },
+                    tooltip:{},
+                    grid:{
+                        top:'20%',
+                    },
+                    xAxis: {
+                        name:'设备异常时间',
+                        type: 'category',
+                        data: dataTimeX,
+                        axisLabel: {
+                            textStyle:{
+                                color: '#fff',
+                            }
+                        },
+                        nameTextStyle:{
+                            color:'#fff',
+                        }
+                    },
+                    yAxis: {
+                        name:'修复时长  单位：min',
+                        type: 'value',
+                        axisLabel: {
+                            textStyle:{
+                                color: '#fff',
+                            }
+                        },
+                        nameTextStyle:{
+                            color:'#fff',
+                        }
+                    },
+                    series: [{
+                        data:dataInterY,
+                        type: 'line'
+                    }]
+                })
+        },
+        error:function(error){
+            alert('默认显示的错误信息',error);
+        }
+    })
+    //让图标根据屏幕适配
+    setTimeout(function (){
+      window.addEventListener("resize", () => {
+        myChart1.resize();
+        myChart2.resize();
+        myChart3.resize();
+        myChart4.resize();
+      })
+    },200)
+    
+
+    
+    
+</script>
+<script type="text/javascript">
+    // requirejs(['../../js/common'], function (common) {
+    //     requirejs(['views/shanghai/report']);
+    // });
+</script>
+</html>

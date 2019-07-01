@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta http-equiv="X-UA-Compatible" content="ie=edge">
+		<script type="text/javascript" src="../../js/lib/jquery.js">
+		</script>
+		<script src="../../js/utils/serverPath.js"></script>
+		<title>短信设置</title>
+		<style>
+			body {
+				width: 100%;
+				height: 100%;
+				background: #0A1433;
+				margin: 0;
+				padding: 0;
+			}
+			
+			.content {
+				width: 900px;
+				height: 900px;
+				margin: 50px auto;
+				text-align: center;
+				position: relative;
+			}
+			
+			h1 {
+				color: #fff;
+			}
+			.modifyk{
+				position: absolute;
+    			right: 220px;
+    			top: 15px;
+            	width:100px;
+            	height:40px;
+            	font-size:20px;
+				color:#fff;
+				cursor: pointer;
+			}
+			.reset{
+    			right: 125px;
+			}
+			.verific{
+				right:0;
+				width:120px;
+			}
+			table {
+				width: 100%;
+				text-align: center;
+				border-collapse: collapse;
+				color: #fff;
+				border: 1px solid #1B4379;
+			}
+			
+			.td_title {
+				width: 130px;
+			}
+			
+			td {
+				padding: 10px 0;
+				font-weight: normal;
+				border: 1px solid #fff;
+			}
+			
+			tbody tr:nth-child(even) {
+				background-color: #0A1433;
+			}
+			
+			tbody tr:nth-child(odd) {
+				background-color: #0E1F43;
+			}
+			
+			input {
+				width: 97%;
+				height: 25px;
+				background: #1f4b85;
+				color: #fff;
+				border: 1px solid #fff;
+				border: none;
+			}
+			
+			button {
+				width: 100px;
+				height: 30px;
+				color: #fff;
+				background: #3F9DFF;
+				border: none;
+				border-radius: 5px;
+				margin: 50px 0;
+				cursor: pointer;
+				outline: none;
+			}
+			.log_wrapper{
+        	    width: 100%;
+        	    height: 100%;
+        	    position: fixed;
+        	    top: 0;
+        	    left: 0;
+        	    background: rgba(0, 0, 0, 0.5);
+        	    z-index: 10;
+        	    font-size: 14px;
+        	    color: rgba(0, 0, 0, 0.8);
+        	}
+			.pop_log{
+				margin:12% auto;
+    			width: 400px;
+    			padding: 30px;
+				border-radius: 5px;
+    			color: white;
+    			background: #111831;
+			}
+			.old_log{
+				margin-bottom:20px;
+			}
+			.ver_log{
+				margin-bottom:10px;
+			}
+			.ver_log span {
+				display: inline-block;
+    			width: 50px;
+			}
+			.passput,.timeput{
+				display: inline-block;
+				width:50%;
+				background: #fff;
+				color:black;
+				padding-left:10px;
+			}
+			.timeput{
+				width:100%;
+				height:23px;
+			}
+			.definebut{
+				background: #032549;
+    			color: white;
+				border: 1px solid #3f9dff;
+				margin:20px 25px 20px 15px;
+			}
+			.alarm_log{
+            	margin:12% auto;
+    			width: 270px;
+            	text-align: center;
+            	padding:15px;
+				border-radius: 5px;
+    			color: white;
+            	background: #111831;
+        	}
+			.time_log{
+				margin:6% auto;
+				padding: 15px 10px 15px 0;
+			}
+        	.areaSel{
+        	    width:170px;
+        	    height:25px;
+        	    background: #fff;
+        	    color:black;
+        	    margin-right:0;
+        	}
+        	.areaPsd{
+        	    width: 153px;
+        	    height: 20px;
+        	    padding-left: 13px;
+        	}
+        	.alarm_but{
+        	    background: #032549;
+        	    color: white;
+        	    border: 1px solid #3f9dff;
+        	    margin: 0 1px 0 6px;
+        	    cursor: pointer;
+			}
+			.cancel{
+        		border: 1px solid grey;
+			}
+			.checkBox{
+				margin-top:10px;
+			}
+			[v-cloak]{
+				display:none;
+			}
+		</style>
+	</head>
+	<script type="text/javascript">
+		$.ajax({
+			type: "get",
+			url: serverPath.page1+"/sendnote/contactmessage",
+			async: true,
+			success: function(result) {
+				var b = $.parseJSON(result);
+				$(document).ready(function() {
+					var str = "";
+					for (var i = 0; i < b.length; i++) {
+						str = "<tr><td>" + b[i].stationName + "</td><td><input value=" + b[i].phones + "></td></tr>";
+						$("#tab").append(str);
+					}
+				});
+			}
+		});
+	</script>
+	<body>
+		<div class="content" id="app" v-if="isShow" v-cloak>
+			<h1>短信设置 </h1>
+			<a href="javascript:;" class="modifyk" @click="changePsd()">修改密码</a>
+			<a href="javascript:;" class="modifyk reset" @click="showReset()">重置密码</a>
+			<a href="javascript:;" class="modifyk verific" @click="showCheck()">检定时间设置</a>
+			<div class="table">
+				</tbody>
+				</table>
+				<table id="tab" class="table" width="100%" layoutH="138">
+				</table>
+			</div>
+			<button onclick=verify()>保存</button>
+			<!-- 修改密码弹框 -->
+			<div class="log_wrapper" v-cloak v-if="ischange">
+				<div class="pop_log">
+					<div class="old_log">
+						<span>请输入原密码:</span>
+						<input type="password" class="passput" v-model="oldPsd">
+					</div>
+					<div class="new_log">
+						<span>请输入新密码:</span>
+						<input type="password" class="passput" v-model="newPsd">
+					</div>
+					<div class="define">
+						<button class="definebut" @click="confirmPsd()">确认</button>
+						<button class="definebut cancel" @click="hideBox()">取消</button>
+					</div>
+				</div>
+			</div>
+			<!-- 重置密码弹框 -->
+			<div class="log_wrapper"  v-cloak v-if="isreset">
+				<div class="alarm_log" >
+					<div class="old_log">
+						<!-- <p>请选择区县:</p> -->
+						<select class="areaSel" name="" id="" @change="resetSelect($event)">
+							<option value="">请选择区县</option>
+							<option v-for="(item,index) in stationName" ::key="index" :value="item">{{item}}</option>
+						</select>
+					</div>
+					<div class="define">
+						<button class="alarm_but" @click="resetPsd()">重置</button>
+						<button class="alarm_but cancel" @click="hideReset()">取消</button>
+					</div>
+				</div>
+			</div>
+			<!-- 检定时间弹框 -->
+			<div class="log_wrapper" v-cloak v-if="ischeck">
+				<div class="alarm_log time_log" >
+					<div class="old_log ver_log" v-for="(item,index) in checkMes" ::key="index">
+						<span :value="item.station_name">{{item.station_name}}</span>
+						<div style="display:inline-block"> 
+							<input type="text"  class="demo-input timeput" id="test" :placeholder="item.check_date" v-cloak>
+						</div>
+					</div>
+					<div class="checkBox">
+						<button class="alarm_but" @click="saveCheck()">保存</button>
+						<button class="alarm_but cancel" @click="checkCancel()">取消</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<script type="text/javascript">
+			function verify() {
+				var content='';
+				var flag = true;
+				var datas = document.getElementsByTagName('input');
+				reg = /^(1\d{10},)*1\d{10}$/
+				console.log(datas[0].value);
+				for (var i = 0; i < datas.length; i++) {
+					if (datas[i].value.length != 0) {
+						if (!reg.test(datas[i].value)) {
+							content=datas[i].value;
+							flag = false;
+							break;
+						}
+					}
+				}
+				if (flag) {
+					$.ajax({
+						type: "post",
+						url: serverPath.page1+"/sendnote/contactpeople",
+						data: {
+							qj: '58000|' + datas[0].value, //全局
+							mh: '58361|' + datas[1].value, //闵行			
+							bs: '58362|' + datas[2].value, //宝山			
+							jd: '58365|' + datas[3].value, //嘉定			
+							cm: '58366|' + datas[4].value, //崇明			
+							xjh: '58367|' + datas[5].value, //徐家汇		
+							hn: '58369|' + datas[6].value, //惠南			
+							pd: '58370|' + datas[7].value, //浦东			
+							js: '58460|' + datas[8].value, //金山			
+							qp: '58461|' + datas[9].value, //青浦			
+							sj: '58462|' + datas[10].value, //松江			
+							fx: '58463|' + datas[11].value, //奉贤			
+							xys: '58474|' + datas[12].value
+						},
+						async: true,
+						success: function(result) {
+							alert(result === true ? '更新成功' : '更新失败')
+							console.log(result);
+						}
+					});
+				} else {
+					alert('文本 [ '+content+' ]输入格式有问题,请检查! \r\n请输入11位纯数字手机号并且每个手机号之间用英文逗号分隔!');
+				}
+			}
+		</script>
+		<script src="../../js/lib/require.js"></script>
+		<script>
+			requirejs(['../../js/common'], function (common) {
+				requirejs(['views/shanghai/control/setting']);
+			});
+		</script>
+	</body>
+</html>
